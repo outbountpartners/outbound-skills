@@ -22,12 +22,43 @@ The server rejects with `422 validation_failed` if any of these are missing:
 
 | Field | Type | How to get it |
 |---|---|---|
-| `date` | ISO-8601 datetime | Parse from user's phrasing. Include timezone or default to UTC. |
+| `date` | ISO-8601 datetime with offset (`2026-06-12T14:00:00Z` or `+01:00`) | Parse from user's phrasing. Plain date strings or "yyyy" alone are rejected. |
 | `client_id` | uuid | Look up via `clients_list` if user gives the client name |
 | `campaign_id` | uuid | Look up via `campaigns_list` with `client_id` filter; pick the active campaign |
 | `company_name` | string | The prospect company (NOT our client — the company the meeting is WITH) |
 | `contact.name` | string | The prospect's full name |
 | `booked_by` OR `x-acting-user` header | uuid | The SDR or admin who booked it |
+
+## Field shapes (commonly tripped up)
+
+```json
+{
+  "date": "2026-06-12T14:00:00Z",          // string, RFC3339 with offset
+  "timezone": "UTC+00:00",                  // string, free-form display label
+  "client_id": "11111111-...",             // uuid
+  "campaign_id": "22222222-...",           // uuid
+  "company_name": "AstraZeneca",
+  "contact": {
+    "name": "Jane Doe",                     // required, min 1 char
+    "title": "VP Ops",                      // optional, defaults to ""
+    "email": "jane@astrazeneca.com",        // optional, RFC-5322 OR empty
+    "phone": "+44 207 123 4567"             // optional, defaults to ""
+  },
+  "sdr_id": "33333333-...",                // optional uuid (the SDR the meeting is FOR)
+  "booked_by": "44444444-...",             // optional uuid (who logged it; or use x-acting-user)
+  "outcome": "scheduled",                  // default for future meetings (see below)
+  "sub_status": ["qualified_pipeline"],    // array of strings
+  "pipeline": {
+    "value": 50000,                        // number or null
+    "currency": "GBP",                     // GBP or USD (defaults to GBP)
+    "status": null                         // closed_won / closed_lost / null
+  }
+}
+```
+
+## Outcome default for future meetings
+
+Use **`outcome: "scheduled"`** for new meetings whose date is in the future. (`"pending"` is a valid enum value too, but it's typically reserved for meetings whose outcome hasn't been recorded yet AFTER the date has passed — see the `update-meeting-outcome` skill for that case.)
 
 ## Resolving names → IDs
 

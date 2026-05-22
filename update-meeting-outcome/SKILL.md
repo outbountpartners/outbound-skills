@@ -23,6 +23,14 @@ User wants to record what happened after a meeting:
 scheduled, pending, completed, cancelled, no_show, rescheduled, to_be_rescheduled
 ```
 
+Convention:
+- `scheduled` — future meeting that hasn't happened yet (default for `book-meeting`)
+- `pending` — meeting date has passed but outcome hasn't been recorded yet
+- `completed` — meeting happened
+- `no_show` — meeting was scheduled but the prospect didn't show
+- `cancelled` — meeting was cancelled before it happened
+- `rescheduled` / `to_be_rescheduled` — meeting was moved
+
 If the user says something else ("happened" → `completed`, "didn't show" → `no_show`, "moved" → `rescheduled`), map to the closest enum and confirm.
 
 ## Sub-statuses

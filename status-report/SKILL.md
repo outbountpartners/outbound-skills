@@ -61,8 +61,8 @@ All from the `outbound-partners` MCP server.
    ```
 
 4. **Optionally include**:
-   - **Pipeline value** — sum `pipeline.value` across `qualified_*` meetings in the period
-   - **Churn risk** — clients with `renewal_status: "Pending"` and `renewal_date` within 60 days (separate `clients_list` call)
+   - **Pipeline value** — sum `pipeline.value` across `qualified_*` meetings in the period. Group by `pipeline.currency` (GBP vs USD) — do NOT mix currencies in a single total.
+   - **Churn risk** — `clients_list { renewal_status: "Pending", renewal_within_days: 60 }`. The server filters server-side and returns only at-risk clients with their `renewal_date`.
 
 5. **Format for the channel the user named**:
    - "for Slack" → use Slack mrkdwn formatting (\* for bold, no markdown headers)
